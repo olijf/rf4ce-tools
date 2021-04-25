@@ -13,8 +13,8 @@ from datetime import datetime
 import binascii
 import functools
 
-from rf4ce import Dot15d4FCS, Dot15d4Data, Raw, makeFCS
-from rf4ce import LinkConfig, Rf4ceNode, Rf4ceFrame, Rf4ceException, Rf4ceConstants
+from rf4ce import Dot15d4FCS, Dot15d4Data, Raw
+from rf4ce import LinkConfig, Rf4ceNode, Rf4ceFrame, Rf4ceException, Rf4ceConstants, Rf4ceMakeFCS
 from rf4ce.radio import RxFlow
 from rf4ce.packetprocessor import PacketProcessor
 import struct
@@ -41,7 +41,7 @@ class KeyProcessor(PacketProcessor):
 		print(hue.info("Processing packet ..."))
 
 		# Check if the 802.15.4 packet is valid
-		if makeFCS(data[:-2]) != data[-2:]:
+		if Rf4ceMakeFCS(data[:-2]) != data[-2:]:
 			print(hue.bad("Invalid packet"))
 			return
 

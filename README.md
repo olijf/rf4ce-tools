@@ -16,6 +16,7 @@ My code is based on:
 
 * [GNU Radio](https://www.gnuradio.org)GNU Radio
 * The IEEE 802.15.4 MAC and PHY layers are provided by the [gr-ieee802-15-4](https://github.com/bastibl/gr-ieee802-15-4/) project
+* The GNU Radio Eventstream Out-of-Tree Synchronous Stream-Event Scheduler [gr-eventstream] (https://github.com/osh/gr-eventstream.git)
 
 I've successfully tested these tools with both a [HackRF](https://greatscottgadgets.com/hackrf) and a newer [PlutoSDR](http://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html).
 

@@ -14,8 +14,8 @@ from datetime import datetime
 import binascii
 import readline
 
-from rf4ce import Dot15d4FCS, Dot15d4Data, Raw, makeFCS
-from rf4ce import LinkConfig, Rf4ceFrame, Rf4ceConstants
+from rf4ce import Dot15d4FCS, Dot15d4Data, Raw
+from rf4ce import LinkConfig, Rf4ceFrame, Rf4ceConstants, Rf4ceMakeFCS
 from rf4ce.radio import TxFlow
 from rf4ce.packetprocessor import PacketProcessor
 import huepy as hue
@@ -37,7 +37,7 @@ class AckProcessor(PacketProcessor):
 		"""Parses a 802.15.4 ACK and extract the seqnum"""
 
 		# Check if the 802.15.4 packet is valid
-		if makeFCS(data[:-2]) != data[-2:]:
+		if Rf4ceMakeFCS(data[:-2]) != data[-2:]:
 			print(hue.bad("Received invalid packet"))
 			return
 

@@ -12,8 +12,8 @@ import argparse
 from datetime import datetime
 import binascii
 
-from rf4ce import Dot15d4FCS, Dot15d4Data, Raw, makeFCS
-from rf4ce import LinkConfig, Rf4ceNode, Rf4ceFrame, Rf4ceException
+from rf4ce import Dot15d4FCS, Dot15d4Data, Raw
+from rf4ce import LinkConfig, Rf4ceNode, Rf4ceFrame, Rf4ceException, Rf4ceMakeFCS
 from rf4ce.radio import RxFlow
 from rf4ce.packetprocessor import PacketProcessor
 import huepy as hue
@@ -36,7 +36,7 @@ class SnifferProcessor(PacketProcessor):
 		print(hue.yellow("Full packet data: ") + hue.italic(binascii.hexlify(data)))
 		
 		# Checks if the 802.15.4 packet is valid
-		if makeFCS(data[:-2]) != data[-2:]:
+		if Rf4ceMakeFCS(data[:-2]) != data[-2:]:
 			print(hue.bad("Invalid packet"))
 			return
 
@@ -80,9 +80,15 @@ class SnifferProcessor(PacketProcessor):
 		# Process RF4CE payload
 		frame = Rf4ceFrame()
 		try:
-			rf4ce_payload = bytes(packet[3].fields["load"])
+			rf4ce_payload = bytes(packet[Raw].fields["load"])
+		except:
+			_, e, _ = sys.exc_info()
+			print(hue.bad("Raw payload not present: {}".format(e)))
+			return
+		try:
 			frame.parse_from_string(rf4ce_payload, source, destination, key)
-		except Rf4ceException, e:
+		except Rf4ceException:
+			_, e, _ = sys.exc_info()
 			print(hue.bad("Cannot parse RF4CE frame: {}".format(e)))
 			return
 		print("###[ " + hue.bold(hue.yellow("RF4CE")) + " ]###")

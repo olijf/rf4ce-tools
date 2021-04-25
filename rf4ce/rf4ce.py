@@ -299,3 +299,18 @@ class Rf4ceFrame(object):
 		result += "[{} - counter:{}] : {}".format(type, counter, data)
 
 		return result
+
+def Rf4ceMakeFCS(data):
+	"""
+	Returns a CRC that is the FCS for the frame (CRC-CCITT Kermit 16bit on the data given)
+	Implemented using pseudocode from: June 1986, Kermit Protocol Manual
+	https://www.kermitproject.org/kproto.pdf
+	"""
+	crc = 0
+	for i in range(0, len(data)):
+		c = ord(data[i])
+		q = (crc ^ c) & 15              #Do low-order 4 bits
+		crc = (crc // 16) ^ (q * 4225)
+		q = (crc ^ (c // 16)) & 15      #And high 4 bits
+		crc = (crc // 16) ^ (q * 4225)
+	return struct.pack('<H', crc) #return as bytes in little endian order
