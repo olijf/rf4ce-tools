@@ -14,7 +14,6 @@ from gnuradio import iio
 from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 import es
-import foo
 import ieee802_15_4
 import osmosdr
 import pmt

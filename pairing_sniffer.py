@@ -33,12 +33,15 @@ class KeyProcessor(PacketProcessor):
 		PacketProcessor.__init__(self)
 		self.wait_pair_cmd = True
 		self.key_index = 0
-		self.key_words = [None] * 0x25
+		self.key_words = []
+		self.key_count = 0
 		self.link_config = LinkConfig()
 		self.success = False
 
 	def process(self, data):
 		print(hue.info("Processing packet ..."))
+		print(hue.bold(hue.green("\n------ {} ------".format(datetime.now()))))
+#		print(hue.yellow("Full packet data: ") + hue.italic(binascii.hexlify(data)))
 
 		# Check if the 802.15.4 packet is valid
 		if Rf4ceMakeFCS(data[:-2]) != data[-2:]:
@@ -59,15 +62,36 @@ class KeyProcessor(PacketProcessor):
 			source = Rf4ceNode(None, packet.src_addr)
 			destination = Rf4ceNode(None, packet.dest_addr)
 		key = None
-		
-		rf4ce_payload = bytes(packet[3].fields["load"])
+
+		try:
+			rf4ce_payload = bytes(packet[3])
+		except:
+			_, e, _ = sys.exc_info()
+			print(hue.bad("Raw payload not present: {}".format(e)))
+			return
+
 		frame = Rf4ceFrame()
-		
+		print(hue.yellow("Raw packet data: ") + hue.italic(binascii.hexlify(rf4ce_payload)))
+
 		try:
 			frame.parse_from_string(rf4ce_payload, source, destination, key)
 		except Rf4ceException, e:
 			print(hue.bad("Cannot parse RF4CE frame: {}".format(e)))
 			return
+
+		if frame.frame_type == Rf4ceConstants.FRAME_TYPE_COMMAND:
+			print(hue.yellow("Command: ") + hue.italic(frame.command))
+
+
+		if frame.frame_type == Rf4ceConstants.FRAME_TYPE_COMMAND:
+			if frame.command == 0x03:
+				print(hue.good("Pairing request !"))
+				self.wait_pair_cmd = True
+				self.key_index = 0
+				self.key_count = self.parse_pairing_request(frame.payload)
+				del self.key_words[:]
+				print(hue.good("Expected key_count = {}".format(self.key_count)))
+				return
 
 		# Start of a key transmission can be detected with 
 		# the pairing response command (0x04)
@@ -87,15 +111,16 @@ class KeyProcessor(PacketProcessor):
 			if frame.frame_type != Rf4ceConstants.FRAME_TYPE_COMMAND:
 				print(hue.bad("Received unexpected frame type: {}".format(frame)))
 				return
-			
+
 			if frame.command != 0x06:
 				print(hue.bad("Received unexpected command: {}".format(frame)))
 				return
-			
-			if frame.payload[0] == self.key_index - 1:
-				self.key_index -= 1
-				print(hue.info("Key word {} has been sent again".format(self.key_index)))
-			
+
+			if self.key_index > 0:
+				if frame.payload[0] == self.key_index - 1:
+					self.key_index -= 1
+					print(hue.info("Key word {} has been sent again".format(self.key_index)))
+
 			if frame.payload[0] != self.key_index:
 				print(hue.bad("Missed key word {} ! Aborting.".format(self.key_index)))
 				self.stop()
@@ -103,9 +128,9 @@ class KeyProcessor(PacketProcessor):
 
 			print(hue.good("Received key word {}".format(self.key_index)))
 
-			self.key_words[self.key_index] = frame.payload[1:]
-			
-			if self.key_index == 0x24:
+			self.key_words.append(frame.payload[1:])
+
+			if self.key_index == self.key_count:
 				print(hue.good("All key words have been received"))
 				self.link_config.key = binascii.hexlify(self.compute_key(self.key_words))
 				self.link_config.frame_counter = frame.frame_counter
@@ -113,6 +138,11 @@ class KeyProcessor(PacketProcessor):
 				self.stop()
 			else:
 				self.key_index += 1
+
+	def parse_pairing_request(self, data):
+		"""Extract key exchange transfer count field"""
+		key_count = data[-1]
+		return key_count
 
 	def parse_pairing_response(self, data):
 		"""Extracts allocated network address and network address

@@ -80,7 +80,7 @@ class SnifferProcessor(PacketProcessor):
 		# Process RF4CE payload
 		frame = Rf4ceFrame()
 		try:
-			rf4ce_payload = bytes(packet[Raw].fields["load"])
+			rf4ce_payload = bytes(packet[3])
 		except:
 			_, e, _ = sys.exc_info()
 			print(hue.bad("Raw payload not present: {}".format(e)))
