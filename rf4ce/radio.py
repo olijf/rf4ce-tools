@@ -127,7 +127,7 @@ class TxFlow(gr.top_block):
 
 class RxFlow(gr.top_block):
 
-	def __init__(self, channel, processor, device="pluto-sdr"):
+	def __init__(self, channel, processor, device="pluto-sdr", pcap_filename=None):
 		gr.top_block.__init__(self, "Sniffer Flow")
 
 		self.processor = processor
@@ -159,7 +159,7 @@ class RxFlow(gr.top_block):
 				int(4e6), int(20e6), 0x8000, True, True, True, "manual", 50, '', True)
 
 
-		self.ieee802_15_4_oqpsk_phy_0 = ieee802_15_4_oqpsk_phy()
+		self.ieee802_15_4_oqpsk_phy_0 = ieee802_15_4_oqpsk_phy(pcap_filename)
 		self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_gr_complex*1)
 
 		self.msg_out_0 = msg_sink_block(self.processor)

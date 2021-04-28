@@ -1,5 +1,5 @@
 Note: Frok from https://github.com/courk/rf4ce-tools
-Changes on branch maint-3.7 verified with Python2 and GNU Radio 3.7
+Changes on branch maint-3.7 verified with Python2, GNU Radio 3.7
 
 # Introduction
 
@@ -17,9 +17,9 @@ They do have the following features:
 
 My code is based on:
 
-* [GNU Radio](https://www.gnuradio.org)GNU Radio
+* [GNU Radio](https://www.gnuradio.org) GNU Radio
 * The IEEE 802.15.4 MAC and PHY layers are provided by the [gr-ieee802-15-4](https://github.com/bastibl/gr-ieee802-15-4/) project
-* The GNU Radio Eventstream Out-of-Tree Synchronous Stream-Event Scheduler [gr-eventstream] (https://github.com/osh/gr-eventstream.git)
+* The GNU Radio Eventstream Out-of-Tree Synchronous Stream-Event Scheduler [gr-eventstream](https://github.com/osh/gr-eventstream.git)
 
 I've successfully tested these tools with both a [HackRF](https://greatscottgadgets.com/hackrf) and a newer [PlutoSDR](http://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html).
 

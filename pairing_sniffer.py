@@ -84,7 +84,7 @@ class KeyProcessor(PacketProcessor):
 
 
 		if frame.frame_type == Rf4ceConstants.FRAME_TYPE_COMMAND:
-			if frame.command == 0x03:
+			if frame.command == Rf4ceConstants.COMMAND_PAIR_REQUEST:
 				print(hue.good("Pairing request !"))
 				self.wait_pair_cmd = True
 				self.key_index = 0
@@ -99,7 +99,7 @@ class KeyProcessor(PacketProcessor):
 		# provided by this command
 		if self.wait_pair_cmd:
 			if frame.frame_type == Rf4ceConstants.FRAME_TYPE_COMMAND:
-				if frame.command == 0x04:
+				if frame.command == Rf4ceConstants.COMMAND_PAIR_RESPONSE:
 					print(hue.good("Key transmission started !"))
 					short_src, short_dest = self.parse_pairing_response(frame.payload)
 					self.link_config.dest_panid = packet.src_panid
@@ -112,7 +112,7 @@ class KeyProcessor(PacketProcessor):
 				print(hue.bad("Received unexpected frame type: {}".format(frame)))
 				return
 
-			if frame.command != 0x06:
+			if frame.command != Rf4ceConstants.COMMAND_KEY_SEED:
 				print(hue.bad("Received unexpected command: {}".format(frame)))
 				return
 
@@ -167,15 +167,16 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument("output_file", help="output JSON file storing link information")
 	parser.add_argument("-c", "--channel", help="RF4CE channel (default: 15)", type=int,
-		choices=[15, 20, 25], default=15)
+		choices=[11, 15, 20, 25, 26], default=15)
 	parser.add_argument("-s", "--sdr", help="SDR Device to use (default: pluto-sdr)", 
 		choices=["hackrf", "pluto-sdr"], default="pluto-sdr")
+	parser.add_argument("-o", "--output", help="File to store pacp dump")
 	args = parser.parse_args()
 
 	print(hue.info("Sniffing on channel {}".format(args.channel)))
 
 	key_processor = KeyProcessor()
-	tb = RxFlow(args.channel, key_processor, args.sdr)
+	tb = RxFlow(args.channel, key_processor, args.sdr, args.output)
 
 	key_processor.start()
 	tb.start()

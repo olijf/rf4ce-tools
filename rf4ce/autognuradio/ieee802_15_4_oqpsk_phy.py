@@ -20,7 +20,7 @@ import pmt
 
 class ieee802_15_4_oqpsk_phy(gr.hier_block2):
 
-    def __init__(self):
+    def __init__(self, pcap_filename=None):
         gr.hier_block2.__init__(
             self, "IEEE802.15.4 OQPSK PHY",
             gr.io_signature(1, 1, gr.sizeof_gr_complex*1),
@@ -54,11 +54,17 @@ class ieee802_15_4_oqpsk_phy(gr.hier_block2):
         self.blocks_complex_to_float_0 = blocks.complex_to_float(1)
         self.analog_quadrature_demod_cf_0 = analog.quadrature_demod_cf(1)
 
+        if pcap_filename:
+            self.foo_wireshark_connector_0 = foo.wireshark_connector(195, False)
+            self.blocks_file_sink_0_0 = blocks.file_sink(gr.sizeof_char*1, pcap_filename, False)
+            self.blocks_file_sink_0_0.set_unbuffered(True)
+
         ##################################################
         # Connections
         ##################################################
         self.msg_connect((self.ieee802_15_4_access_code_prefixer_0, 'out'), (self.blocks_pdu_to_tagged_stream_0_0_0, 'pdus'))
         self.msg_connect((self.ieee802_15_4_packet_sink_0, 'out'), (self, 'rxout'))
+        self.msg_connect((self.ieee802_15_4_packet_sink_0, 'out'), (self.foo_wireshark_connector_0, 'in'))
         self.msg_connect((self, 'txin'), (self.ieee802_15_4_access_code_prefixer_0, 'in'))
         self.connect((self.analog_quadrature_demod_cf_0, 0), (self.blocks_sub_xx_0, 0))
         self.connect((self.analog_quadrature_demod_cf_0, 0), (self.single_pole_iir_filter_xx_0, 0))
@@ -77,6 +83,9 @@ class ieee802_15_4_oqpsk_phy(gr.hier_block2):
         self.connect((self.foo_burst_tagger_0, 0), (self, 0))
         self.connect((self, 0), (self.analog_quadrature_demod_cf_0, 0))
         self.connect((self.single_pole_iir_filter_xx_0, 0), (self.blocks_sub_xx_0, 1))
+
+        if pcap_filename:
+            self.connect((self.foo_wireshark_connector_0, 0), (self.blocks_file_sink_0_0, 0))
 
     def get_samp_rate(self):
         return self.samp_rate

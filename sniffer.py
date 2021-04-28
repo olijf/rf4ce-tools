@@ -100,9 +100,10 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-l", "--link", help="JSON file containing link information")
 	parser.add_argument("-c", "--channel", help="RF4CE channel (default: 15)", type=int,
-		choices=[15, 20, 25], default=15)
+		choices=[11, 15, 20, 25, 26], default=15)
 	parser.add_argument("-s", "--sdr", help="SDR Device to use (default: pluto-sdr)", 
 		choices=["hackrf", "pluto-sdr"], default="pluto-sdr")
+	parser.add_argument("-o", "--output", help="File to store pacp dump")
 	args = parser.parse_args()
 
 	if args.link:
@@ -120,7 +121,7 @@ if __name__ == '__main__':
 		sniffer_processor = SnifferProcessor([link_config])
 	else:
 		sniffer_processor = SnifferProcessor([])
-	tb = RxFlow(args.channel, sniffer_processor, args.sdr)
+	tb = RxFlow(args.channel, sniffer_processor, args.sdr, args.output)
 	
 	sniffer_processor.start()
 	tb.start()
