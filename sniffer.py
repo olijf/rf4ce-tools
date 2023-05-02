@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Sniffs RF4CE packets. Supports encryption.
@@ -8,6 +8,8 @@ from __future__ import (absolute_import,
                         print_function, unicode_literals)
 from builtins import *
 
+
+import sys
 import argparse
 from datetime import datetime
 import binascii
@@ -32,17 +34,17 @@ class SnifferProcessor(PacketProcessor):
 		self.link_configs = link_configs
 
 	def process(self, data):
-		print(hue.bold(hue.green("\n------ {} ------".format(datetime.now()))))
-		print(hue.yellow("Full packet data: ") + hue.italic(binascii.hexlify(data)))
+		print((hue.bold(hue.green("\n------ {} ------".format(datetime.now())))))
+		print((hue.yellow("Full packet data: ") + hue.italic(binascii.hexlify(data))))
 		
 		# Checks if the 802.15.4 packet is valid
 		if Rf4ceMakeFCS(data[:-2]) != data[-2:]:
-			print(hue.bad("Invalid packet"))
+			print((hue.bad("Invalid packet")))
 			return
 
 		# Parses 802.15.4 packet
 		packet = Dot15d4FCS(data)
-		packet.show()
+		#packet.show()
 
 		if packet.fcf_frametype == 2: # ACK
 			return
@@ -74,7 +76,13 @@ class SnifferProcessor(PacketProcessor):
 				destination = Rf4ceNode(packet.dest_addr, None)
 			else:
 				source = Rf4ceNode(None, packet.src_addr)
-				destination = Rf4ceNode(None, packet.dest_addr)
+				try:
+					destination = Rf4ceNode(None, packet.dest_addr)
+				except Exception as e:
+					print((hue.bad("Cannot parse: {}".format(e))))
+					packet.show()
+					return
+					#destination = Rf4ceNode(None, packet.dest_addr)
 			key = None
 
 		# Process RF4CE payload
@@ -83,15 +91,15 @@ class SnifferProcessor(PacketProcessor):
 			rf4ce_payload = bytes(packet[3])
 		except:
 			_, e, _ = sys.exc_info()
-			print(hue.bad("Raw payload not present: {}".format(e)))
+			print((hue.bad("Raw payload not present: {}".format(e))))
 			return
 		try:
 			frame.parse_from_string(rf4ce_payload, source, destination, key)
 		except Rf4ceException:
 			_, e, _ = sys.exc_info()
-			print(hue.bad("Cannot parse RF4CE frame: {}".format(e)))
+			print((hue.bad("Cannot parse RF4CE frame: {}".format(e))))
 			return
-		print("###[ " + hue.bold(hue.yellow("RF4CE")) + " ]###")
+		print(("###[ " + hue.bold(hue.yellow("RF4CE")) + " ]###"))
 		print(frame)
 
 
@@ -110,12 +118,12 @@ if __name__ == '__main__':
 		try:
 			link_config = LinkConfig(args.link)
 		except:
-			print(hue.bad("Cannot load configuration file"))
+			print((hue.bad("Cannot load configuration file")))
 			exit(-1)
 
 	if args.link:
 		print(link_config)
-	print(hue.info("Sniffing on channel {}".format(args.channel)))
+	print((hue.info("Sniffing on channel {}".format(args.channel))))
 
 	if args.link:
 		sniffer_processor = SnifferProcessor([link_config])
@@ -127,11 +135,11 @@ if __name__ == '__main__':
 	tb.start()
 
 	try:
-		raw_input(hue.info('Sniffing...\n'))
+		input(hue.info('Sniffing...\n'))
 	except (EOFError, KeyboardInterrupt):
 		pass
 	
-	print(hue.info("Exiting..."))
+	print((hue.info("Exiting...")))
 
 	tb.stop()
 	tb.wait()

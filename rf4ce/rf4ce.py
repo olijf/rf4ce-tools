@@ -316,7 +316,7 @@ def Rf4ceMakeFCS(data):
 	"""
 	crc = 0
 	for i in range(0, len(data)):
-		c = ord(data[i])
+		c = data[i]
 		q = (crc ^ c) & 15              #Do low-order 4 bits
 		crc = (crc // 16) ^ (q * 4225)
 		q = (crc ^ (c // 16)) & 15      #And high 4 bits

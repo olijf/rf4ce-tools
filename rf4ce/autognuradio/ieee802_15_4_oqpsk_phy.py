@@ -5,6 +5,7 @@
 # Generated: Wed Jul 12 20:16:06 2017
 ##################################################
 
+
 from gnuradio import analog
 from gnuradio import blocks
 from gnuradio import digital
@@ -46,7 +47,7 @@ class ieee802_15_4_oqpsk_phy(gr.hier_block2):
         self.blocks_vector_source_x_0 = blocks.vector_source_c([0, sin(pi/4), 1, sin(3*pi/4)], True, 1, [])
         self.blocks_sub_xx_0 = blocks.sub_ff(1)
         self.blocks_repeat_0 = blocks.repeat(gr.sizeof_gr_complex*1, 4)
-        self.blocks_pdu_to_tagged_stream_0_0_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, 'pdu_length')
+        self.blocks_pdu_to_tagged_stream_0_0_0 = blocks.pdu_to_tagged_stream(gr.gr_python.types.byte_t, 'pdu_length')
         self.blocks_packed_to_unpacked_xx_0 = blocks.packed_to_unpacked_bb(4, gr.GR_LSB_FIRST)
         self.blocks_multiply_xx_0 = blocks.multiply_vcc(1)
         self.blocks_float_to_complex_0 = blocks.float_to_complex(1)

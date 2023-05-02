@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Injects arbitrary RF4CE packets. Support encryption.
@@ -38,7 +38,7 @@ class AckProcessor(PacketProcessor):
 
 		# Check if the 802.15.4 packet is valid
 		if Rf4ceMakeFCS(data[:-2]) != data[-2:]:
-			print(hue.bad("Received invalid packet"))
+			print((hue.bad("Received invalid packet")))
 			return
 
 		packet = Dot15d4FCS(data)
@@ -226,7 +226,7 @@ class Injector(object):
 				a = hue.lightblue("{}".format(self.rf4ce_frame.frame_counter))
 				b = hue.lightblue("0x{:02x}".format(self.rf4ce_frame.profile_indentifier))
 				c = hue.lightblue(ciphered_status)
-				cmd = raw_input("({} - {} - {})>>> ".format(a, b, c))
+				cmd = input("({} - {} - {})>>> ".format(a, b, c))
 			except KeyboardInterrupt:
 				raise StopIteration
 
@@ -314,9 +314,9 @@ class Injector(object):
 
 	def log(self, data, format=None):
 		if format:
-			print(format("[{}] {}".format(datetime.now(), data)))
+			print((format("[{}] {}".format(datetime.now(), data))))
 		else:
-			print("[{}] {}".format(datetime.now(), data))
+			print(("[{}] {}".format(datetime.now(), data)))
 
 
 if __name__ == '__main__':
@@ -332,7 +332,7 @@ if __name__ == '__main__':
 	try:
 		link_config = LinkConfig(args.config_file)
 	except:
-		print(hue.bad("Cannot load configuration file"))
+		print((hue.bad("Cannot load configuration file")))
 		exit(-1)
 
 	print(link_config)

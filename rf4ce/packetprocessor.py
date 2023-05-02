@@ -4,10 +4,10 @@ Packet processor tread. Used to process the incoming RF4CE packets.
 """
 
 import threading
-import Queue
+import queue
 
-from linkconfig import LinkConfig
-from rf4ce import Rf4ceNode, Rf4ceFrame
+from .linkconfig import LinkConfig
+from .rf4ce import Rf4ceNode, Rf4ceFrame
 
 
 class PacketProcessor(threading.Thread):
@@ -16,7 +16,7 @@ class PacketProcessor(threading.Thread):
 
 	def __init__(self):
 		threading.Thread.__init__(self)
-		self.q = Queue.Queue()
+		self.q = queue.Queue()
 		self.stopped = False
 
 	def stop(self):
@@ -26,7 +26,7 @@ class PacketProcessor(threading.Thread):
 		while not self.stopped:
 			try:
 				data = self.q.get(timeout=1)
-			except Queue.Empty:
+			except queue.Empty:
 				continue
 			self.process(data)
 	

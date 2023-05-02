@@ -6,7 +6,7 @@ Describes a RF4CE link.
 import json
 import binascii
 
-from rf4ce import Rf4ceNode
+from .rf4ce import Rf4ceNode
 
 
 class LinkConfig(object):
@@ -33,7 +33,7 @@ class LinkConfig(object):
 		try:
 			f = open(self.config_filename, "rb")
 		except IOError:
-			print("Cannot open configuration file '{}'".format(self.config_filename))
+			print(("Cannot open configuration file '{}'".format(self.config_filename)))
 			raise
 
 		try:
@@ -72,7 +72,7 @@ class LinkConfig(object):
 		try:
 			f = open(self.config_filename, "wb")
 		except IOError:
-			print("Cannot open configuration file '{}'".format(self.config_filename))
+			print(("Cannot open configuration file '{}'".format(self.config_filename)))
 			raise		
 		json.dump(json_config, f, indent=4)
 		f.close()
